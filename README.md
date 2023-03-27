@@ -1,1 +1,1 @@
-# barbershop-project
+# 100 days of python
