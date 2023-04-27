@@ -10,5 +10,6 @@ class Food(Turtle):
         self.color('blue')       
         self.goto(random_spot_x,random_spot_y)
         
+        
 
         

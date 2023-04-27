@@ -40,3 +40,11 @@ class Snake:
         if self.all_turtles[0].heading() != 90:
             self.all_turtles[0].setheading(270)
 
+    def reset_game(self):
+        for snake in self.all_turtles:
+            snake.hideturtle()
+        self.all_turtles.clear()       
+        x = 0
+        for i in range(3):
+            self.add_snake((x,0))     
+            x -=20

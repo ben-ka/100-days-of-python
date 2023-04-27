@@ -49,16 +49,20 @@ def collision_with_tail():
 
 game_is_on =True
 while game_is_on:
-    my_score.write(f'Score: {my_score.score}',False,'center',('courier',26,'bold'))
+    
     screen.update()
     time.sleep(0.06)
     
     listen()
     if collision_with_tail() ==True:
-        game_is_on = False
+        my_score.reset_score()
+        snake.reset_game()
+        snake.all_turtles[0].home()
     snake.move(snake.all_turtles)
-    if snake_in_bounds() == False:                  # detect collision with walls
-        game_is_on = False
+    if snake_in_bounds() == False:  
+        snake.all_turtles[0].home()        # detect collision with walls
+        my_score.reset_score()
+        snake.reset_game()
     if collision_with_food() ==True:
         my_score.add_score()
         my_score.clear()
@@ -67,6 +71,7 @@ while game_is_on:
         random_x = random.randint(-WIDTH/2+WIDTH/10,WIDTH/2 -WIDTH/10)
         random_y = random.randint(-HEIGHT/2+HEIGHT/10, HEIGHT/2 -HEIGHT/10)
         food = Food(random_x,random_y)
+    my_score.update_score()
     #detect collision with tail
     
 
@@ -75,7 +80,8 @@ while game_is_on:
 
 
 snake.all_turtles[0].setpos(-WIDTH/7,0)
-snake.all_turtles[0].write('game over',False,'left',('courier',35,'bold'))    
+#snake.all_turtles[0].write('game over',False,'left',('courier',35,'bold'))   
+
     
 
  
