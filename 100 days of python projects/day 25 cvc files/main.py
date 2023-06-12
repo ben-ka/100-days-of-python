@@ -48,12 +48,6 @@ while game_is_on:
 def get_coor(x,y):
     print(x,y)
 turtle.onscreenclick(get_coor)
-states_to_learn = []
-for state in state_location_dict:
-    states_to_learn.append(state)
-
+states_to_learn = [state for state in state_location_dict]
 states_to_print = pandas.DataFrame(states_to_learn)
 states_to_print.to_csv('states_to_learn.csv')
-
-
-
