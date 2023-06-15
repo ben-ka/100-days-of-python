@@ -6,10 +6,13 @@ window.title('mile to km converter')
 window.minsize(width=200,height=200)
 
 def radio_used():
-    print(radio_state.get())
-    if radio_state.get() ==2:
+   print(radio_state.get())
+   if radio_state.get() ==2:
       label1.config(text='Km')
       label4.config(text='miles')
+   if radio_state.get() == 1:
+      label1.config(text='miles')
+      label4.config(text='km')
 #Variable to hold on to which radio button value is checked.
 radio_state = IntVar()
 radiobutton1 = Radiobutton(text="mile to km", value=1, variable=radio_state, command=radio_used)
