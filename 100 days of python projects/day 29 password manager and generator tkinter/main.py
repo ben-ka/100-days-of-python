@@ -3,6 +3,7 @@ from tkinter import messagebox
 from password_generator_logic import Generate
 import pyperclip
 
+
 #constants
 WIDTH = 800
 HEIGHT = 800
@@ -46,6 +47,12 @@ def IS_website_ava():
                 return False
         return True
 
+# checks if all the entries have been filled
+def Entries_ok():
+    if len(website_selected.get()) > 0 and len(username_selected.get()) > 0  and len(password_selected.get()) > 0:
+        return True
+    return False
+
 
 # username entry
 
@@ -64,7 +71,7 @@ password_label.grid(column=0,row=3)
 
 
 
-password_selected = Entry(width=int(WIDTH/13.2))
+password_selected = Entry(width=int(WIDTH/13.6))
 password_selected.config(font=(FONT_NAME,int(FONT_SIZE/1.85)))
 password_selected.grid(column=1,row=3,ipady=10)
 
@@ -77,19 +84,33 @@ def Generate_button_pressed():
     password_selected.insert(0,generated_password)
     
 
-generate_password = Button(text = 'Generate password',font=(FONT_NAME,int(FONT_SIZE/1.3),'italic'),command=Generate_button_pressed)
+generate_password = Button(text = 'Generate password',font=(FONT_NAME,int(FONT_SIZE/1.3),'italic'),command=Generate_button_pressed,width=19)
 generate_password.grid(column=2,row=3,pady=20,padx=10)
 
 
 #add button
 def OnAddButtonPressed():
     with open('passwords.txt','a') as passwords_saved:
-        if IS_website_ava() == True :
-            complete = f'{website_selected.get()}  || {username_selected.get()}  || {password_selected.get()}'
-            passwords_saved.write(complete)
-            passwords_saved.write('\n\n')
+        is_ok = False
+        is_webstie_aval = IS_website_ava()
+        if  is_webstie_aval == True  :
+            if Entries_ok() == True :
+                is_ok = messagebox.askokcancel(message=f'These are the details entered: \n Email: {username_selected.get()} \n Password: {password_selected.get()} \n Is it ok to save? ',title='Confirm Details')
+                if is_ok:
+                    complete = f'{website_selected.get()}  | {username_selected.get()}  | {password_selected.get()}'
+                    passwords_saved.write(complete)
+                    passwords_saved.write('\n\n')
+            else:
+                messagebox.showerror(title= 'Error',message='Not all fields are registered \nPlease fill the missing entries')
+            
+                
         else:
             messagebox.showerror(title='Error',message='Website already exists in password manager')
+    
+    username_selected.delete(0,END)
+    password_selected.delete(0,END)
+    if is_ok or  is_webstie_aval == False :
+        website_selected.delete(0,END)
             
         
 
