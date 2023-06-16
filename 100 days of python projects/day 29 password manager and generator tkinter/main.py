@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from password_generator_logic import Generate
 import pyperclip
+import json
 
 
 #constants
@@ -32,26 +33,65 @@ canvas.grid(column=1,row=0)
 website_label = Label(text='Website: ',font=(FONT_NAME,FONT_SIZE,'italic'))
 website_label.grid(column=0,row=1)
 
-website_selected = Entry(width=int(WIDTH/9))
+website_selected = Entry(width=int(WIDTH/13.6))
 website_selected.config(font=(FONT_NAME,int(FONT_SIZE/1.85)))
-website_selected.grid(column=1,row=1,ipady=10,columnspan=2,pady=20)
+website_selected.grid(column=1,row=1,ipady=10,columnspan=1,pady=20)
 
+
+# search for a website and get details
+
+def GetDetailsFromWebsite():
+    website = website_selected.get()
+    is_there = True
+    try:
+        with open('passwords.json','r') as file1 :
+            data = json.load(file1)
+        try:
+            details = data[website]
+        except KeyError:
+            is_there =False
+        else:
+            password = details['Password']
+            email = details['Email']
+            messagebox.showinfo(title=f'{website} details', message=f'Your login data is: \nEmail/Username: {email} \n Password: {password}')
+            pyperclip.copy(password)
+    except FileNotFoundError:
+        is_there = False
+    if is_there == False:
+        messagebox.showerror(message='This website name does not exist',title='Error')
+
+
+
+
+
+search_website = Button(text='Search',font=(FONT_NAME,int(FONT_SIZE/1.3),'italic'),command=GetDetailsFromWebsite,width=19)
+search_website.grid(column=2,row=1,pady=20,padx=10)
 
 #function to check if the website is alradey entered
 def IS_website_ava():
     name = website_selected.get()
-    with open ('passwords.txt','r') as file:
-        lines = file.readlines()
-        for line in lines:
-            if name in line:
+
+    try:
+        with open ('passwords.json','r') as file1:
+            data = json.load(file1)
+            try:
+                data[name] = data[name]
+            except KeyError:
+                return True
+            else:
                 return False
+    except FileNotFoundError:
         return True
+
 
 # checks if all the entries have been filled
 def Entries_ok():
     if len(website_selected.get()) > 0 and len(username_selected.get()) > 0  and len(password_selected.get()) > 0:
         return True
     return False
+
+
+
 
 
 # username entry
@@ -90,26 +130,54 @@ generate_password.grid(column=2,row=3,pady=20,padx=10)
 
 #add button
 def OnAddButtonPressed():
-    with open('passwords.txt','a') as passwords_saved:
-        is_ok = False
-        is_webstie_aval = IS_website_ava()
-        if  is_webstie_aval == True  :
-            if Entries_ok() == True :
-                is_ok = messagebox.askokcancel(message=f'These are the details entered: \n Email: {username_selected.get()} \n Password: {password_selected.get()} \n Is it ok to save? ',title='Confirm Details')
-                if is_ok:
-                    complete = f'{website_selected.get()}  | {username_selected.get()}  | {password_selected.get()}'
-                    passwords_saved.write(complete)
-                    passwords_saved.write('\n\n')
+    website = website_selected.get()
+    email = username_selected.get()
+    password = password_selected.get()
+
+
+    is_webstie_aval = IS_website_ava()
+    entries_good = Entries_ok()
+    if  is_webstie_aval == True :
+        if entries_good == True : 
+            new_data = {website :
+                        {'Email' : email,
+                        'Password' : password},                             
+                        } 
+            with open('passwords.txt','w') as passwords_saved:
+                complete = f'{website_selected.get()}  | {username_selected.get()}  | {password_selected.get()}'
+                passwords_saved.write(f'{complete}\n\n')
+
+            try:   
+                with open('passwords.json','r') as passwords_saved:
+                # reading old data off json
+                    data = json.load(passwords_saved)
+                    # updating new data into old data           
+
+            except FileNotFoundError:
+                with open('passwords.json','w') as file1:
+                    json.dump(new_data,file1,indent=4)
+
             else:
-                messagebox.showerror(title= 'Error',message='Not all fields are registered \nPlease fill the missing entries')
+                data.update(new_data) 
+                with open('passwords.json','w') as passwords_saved:
+            # writing the updated data into json
+                    json.dump(data,passwords_saved,indent=4)
+
             
-                
+
+            
+
+        
         else:
-            messagebox.showerror(title='Error',message='Website already exists in password manager')
+            messagebox.showerror(title= 'Error',message='Not all fields are registered \nPlease fill the missing entries')
+        
+            
+    else:
+        messagebox.showerror(title='Error',message='Website already exists in password manager')
     
     username_selected.delete(0,END)
     password_selected.delete(0,END)
-    if is_ok or  is_webstie_aval == False :
+    if entries_good == True:
         website_selected.delete(0,END)
             
         
